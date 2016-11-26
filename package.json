@@ -1,0 +1,19 @@
+{
+  "name": "basic-redux",
+  "version": "1.0.0",
+  "description": "Super basic sample of redux",
+  "main": "index.js",
+  "dependencies": {
+    "redux": "^3.6.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Redux",
+    "Basic"
+  ],
+  "author": "Jesus B. Nana",
+  "license": "MIT"
+}
