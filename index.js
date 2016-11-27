@@ -1,5 +1,6 @@
 let createStore = require('redux').createStore;
 let applyMiddleware = require('redux').applyMiddleware;
+let logger = require('redux-logger');
 
 const reducer = (state = 0, action) => {
   switch (action.type) {
@@ -16,11 +17,6 @@ const reducer = (state = 0, action) => {
   return state;
 }
 
-const logger = (store) => (next) => (action) => {
-  console.log("action fired", action);
-  next(action);
-}
-
 const error = (store) => (next) => (action) => {
   try {
     next(action);
@@ -29,7 +25,7 @@ const error = (store) => (next) => (action) => {
   }
 }
 
-let middleware = applyMiddleware(logger, error);
+let middleware = applyMiddleware(logger(), error);
 
 const store = createStore(reducer, 0, middleware);
 
