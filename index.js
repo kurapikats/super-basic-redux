@@ -1,43 +1,56 @@
-let createStore = require('redux').createStore;
-let applyMiddleware = require('redux').applyMiddleware;
-let logger = require('redux-logger');
+import {createStore, applyMiddleware} from 'redux';
+import logger from 'redux-logger';
+import thunk from 'redux-thunk';
+import axios from 'axios';
+import promise from 'redux-promise-middleware';
 
-const reducer = (state = 0, action) => {
+const initialState = {
+  fetching: false,
+  fetched: false,
+  users: [],
+  error: null
+};
+
+const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case "INC":
-      return state + action.payload;
+    case "FETCH_USERS_PENDING": {
+      return {
+        ...state,
+        fetching: true
+      };
       break;
-    case "DEC":
-      return state - action.payload;
+    }
+    case "FETCH_USERS_REJECTED": {
+      return {
+        ...state,
+        fetching: false,
+        error: action.payload
+      };
       break;
-    case "ERR":
-      throw new Error("This is an error message.");
+    }
+    case "FETCH_USERS_FULFILLED": {
+      return {
+        ...state,
+        fetching: false,
+        fetched: true,
+        users: action.payload
+      };
       break;
+    }
   }
   return state;
 }
 
-const error = (store) => (next) => (action) => {
-  try {
-    next(action);
-  } catch (e) {
-    console.log("Error", e);
-  }
-}
+let middleware = applyMiddleware(promise(), thunk, logger());
 
-let middleware = applyMiddleware(logger(), error);
-
-const store = createStore(reducer, 0, middleware);
+const store = createStore(reducer, middleware);
 
 store.subscribe(() => {
   console.log("store changed", store.getState());
 });
 
 // type is required, payload variable name can be changed
-store.dispatch({type: "INC", payload: 1});
-store.dispatch({type: "INC", payload: 3});
-store.dispatch({type: "INC", payload: 56});
-store.dispatch({type: "DEC", payload: 2});
-store.dispatch({type: "DEC", payload: 22});
-store.dispatch({type: "ERR"});
-store.dispatch({type: "INC", payload: 22});
+store.dispatch({
+  type: "FETCH_USERS",
+  payload: axios.get("http://rest.learncode.academy/api/wstern/users")
+});
